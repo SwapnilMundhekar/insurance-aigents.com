@@ -1,0 +1,60 @@
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: insurance_aigents_api
+    env_file:
+      - .env.example
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+      - qdrant
+    volumes:
+      - ./backend:/app
+      - ./data:/data
+    networks:
+      - insurance_aigents_network
+
+  postgres:
+    image: postgres:16
+    container_name: insurance_aigents_postgres
+    environment:
+      POSTGRES_DB: insurance_aigents
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - insurance_aigents_network
+
+  redis:
+    image: redis:7
+    container_name: insurance_aigents_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - insurance_aigents_network
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: insurance_aigents_qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - insurance_aigents_network
+
+volumes:
+  postgres_data:
+  qdrant_data:
+
+networks:
+  insurance_aigents_network:
+    driver: bridge

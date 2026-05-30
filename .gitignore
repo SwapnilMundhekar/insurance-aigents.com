@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+node_modules/
+.next/
+dist/
+build/
+data/uploads/*
+data/indexes/*
+data/logs/*
+!data/uploads/.gitkeep
+!data/indexes/.gitkeep
+!data/logs/.gitkeep
