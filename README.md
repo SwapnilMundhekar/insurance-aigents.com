@@ -1,18 +1,18 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&height=230&color=0:0f172a,50:1e40af,100:06b6d4&text=InsuranceAIGents.com&fontColor=ffffff&fontSize=48&fontAlignY=38&desc=Enterprise%20Agentic%20Insurance%20Operations%20Platform&descAlignY=58&animation=fadeIn" alt="InsuranceAIGents animated banner" />
+<img src="https://capsule-render.vercel.app/api?type=waving&height=230&color=0:0f172a,50:1e40af,100:06b6d4&text=InsuranceAIGents.com&fontColor=ffffff&fontSize=48&fontAlignY=38&desc=Agentic%20RAG%20Insurance%20Operations%20Platform&descAlignY=58&animation=fadeIn" alt="InsuranceAIGents animated banner" />
 
 <br/>
 
-<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=700&size=26&duration=2800&pause=700&color=38BDF8&center=true&vCenter=true&width=850&lines=Multi-Agent+Insurance+Decision+Systems;Agentic+RAG+with+Tool+Calling;Local-First+AI+Architecture;Traceable%2C+Auditable%2C+Human-Governed+AI" alt="Animated typing headline" />
+<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=700&size=26&duration=2800&pause=700&color=38BDF8&center=true&vCenter=true&width=950&lines=Agentic+RAG+for+Insurance+Operations;Supervisor+Orchestration+with+Tool+Calling;Reflection%2C+Human+Review%2C+and+Traceable+AI;Local-First+Enterprise+AI+Engineering" alt="Animated typing headline" />
 
 <br/>
 
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge\&logo=python\&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-API%20Gateway-009688?style=for-the-badge\&logo=fastapi\&logoColor=white)
 ![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-111827?style=for-the-badge)
-![RAG](https://img.shields.io/badge/RAG-Retrieval%20Augmented%20Generation-7C3AED?style=for-the-badge)
-![Agentic AI](https://img.shields.io/badge/Agentic%20AI-Supervisor%20Workflow-06B6D4?style=for-the-badge)
+![Agentic RAG](https://img.shields.io/badge/Agentic%20RAG-Supervisor%20Driven-7C3AED?style=for-the-badge)
+![Tool Calling](https://img.shields.io/badge/Tool%20Calling-Controlled%20Registry-06B6D4?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Local%20MVP%20Build-22C55E?style=for-the-badge)
 
 </div>
@@ -21,17 +21,57 @@
 
 # InsuranceAIGents.com
 
-**InsuranceAIGents.com** is a local-first enterprise AI engineering showcase project for building **agentic insurance operations workflows** using multi-agent orchestration, Retrieval Augmented Generation, controlled tool calling, trace logging, and human review decision patterns.
+**InsuranceAIGents.com** is a local-first **Agentic RAG Insurance Operations Platform**.
 
-This project is designed to demonstrate how an insurance organisation could move beyond a simple chatbot and toward a safer, more observable, and more governable AI decision-support platform.
+It demonstrates how an enterprise insurance workflow can move beyond a basic chatbot or simple Retrieval Augmented Generation system by using a **Supervisor Agent** to coordinate retrieval, tool calling, reflection, human review decisions, and trace logging before producing a final grounded answer.
+
+The project is designed as an AI engineering showcase for building production-style agentic systems in regulated insurance environments.
+
+---
+
+## One-Line Summary
+
+**InsuranceAIGents.com is an Agentic Retrieval Augmented Generation platform where a Supervisor Agent coordinates document retrieval, insurance tools, reflection checks, human review logic, and traceable decision workflows.**
 
 ---
 
 ## Why This Project Exists
 
-Insurance workflows are complex. Claims, policy interpretation, fraud signals, evidence requirements, compliance checks, and human review decisions cannot be handled safely by a single free-form chatbot.
+Insurance workflows are too important for a single free-form chatbot.
 
-This project uses a more enterprise-ready pattern:
+A basic chatbot may answer directly from the model's internal knowledge.
+A basic RAG system may retrieve a few chunks and then answer.
+But insurance use cases require more control.
+
+Claims, policy interpretation, evidence requirements, fraud indicators, compliance checks, and human review decisions need:
+
+* trusted document grounding
+* controlled tool calling
+* workflow orchestration
+* traceability
+* reflection and critique
+* escalation logic
+* audit-friendly outputs
+
+This project implements those ideas through an **Agentic RAG architecture**.
+
+---
+
+## Normal RAG vs Agentic RAG
+
+| Basic RAG                        | InsuranceAIGents.com Agentic RAG                                                          |
+| -------------------------------- | ----------------------------------------------------------------------------------------- |
+| Query → retrieve chunks → answer | Query → rewrite → retrieve → evaluate context → call tools → answer → reflect → log trace |
+| One retrieval step               | Multi-step supervised workflow                                                            |
+| Limited control flow             | Supervisor Agent controls the workflow                                                    |
+| Usually no tool calling          | Uses controlled insurance tools                                                           |
+| Weak auditability                | Stores trace logs and tool results                                                        |
+| Model mostly answers directly    | Model is guided by retrieved evidence and structured tool outputs                         |
+| No escalation logic              | Supports human review decisions                                                           |
+
+---
+
+## High-Level Agentic Flow
 
 ```text
 User question
@@ -40,35 +80,43 @@ Input validation
     ↓
 Supervisor Agent
     ↓
-Query rewriting
+Query Rewrite Agent
     ↓
-Document retrieval
+Retrieval Agent
     ↓
-Insurance tool calling
+Insurance Tool Calling Agent
     ↓
-Grounded answer generation
+Coverage / Evidence / Fraud / Human Review tools
     ↓
-Reflection and review
+Answer Agent
     ↓
-Traceable final response
+Reflection Agent
+    ↓
+Trace Logger
+    ↓
+Final grounded answer
 ```
 
 ---
 
 ## Core Capabilities
 
-| Capability               | Description                                                     |
-| ------------------------ | --------------------------------------------------------------- |
-| **Agentic RAG**          | Retrieves relevant policy context before generating an answer   |
-| **Supervisor Agent**     | Controls the workflow and coordinates specialist steps          |
-| **Query Rewrite Agent**  | Converts user questions into better retrieval queries           |
-| **Retrieval Agent**      | Searches indexed insurance document chunks                      |
-| **Tool Calling Agent**   | Calls approved insurance tools through a controlled registry    |
-| **Reflection Agent**     | Reviews answer quality, grounding, and risk                     |
-| **Trace Logging**        | Records each agent step for auditability and debugging          |
-| **Human Review Logic**   | Escalates uncertain or risky cases instead of blindly approving |
-| **Local LLM Serving**    | Uses local model serving through Ollama during development      |
-| **Token-Aware Chunking** | Splits documents into manageable chunks with overlap            |
+| Capability               | Description                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------------- |
+| **Agentic RAG**          | Retrieval is controlled by a supervisor workflow rather than a single static search step |
+| **Supervisor Agent**     | Coordinates query rewriting, retrieval, tool calling, answer generation, and reflection  |
+| **Query Rewrite Agent**  | Converts user questions into more precise retrieval queries                              |
+| **Retrieval Agent**      | Searches indexed insurance document chunks                                               |
+| **Tool Calling Agent**   | Calls approved insurance tools through a controlled registry                             |
+| **Coverage Tool**        | Checks whether the claim appears related to covered events or exclusions                 |
+| **Evidence Tool**        | Identifies likely evidence required for claim assessment                                 |
+| **Fraud Tool**           | Detects simple fraud risk indicators from claim wording                                  |
+| **Human Review Tool**    | Decides whether a case should be escalated                                               |
+| **Reflection Agent**     | Reviews answer grounding, risk, and source support                                       |
+| **Trace Logger**         | Records each workflow step for auditability and debugging                                |
+| **Local LLM Serving**    | Uses local model serving through Ollama during development                               |
+| **Token-Aware Chunking** | Splits documents into manageable chunks with overlap                                     |
+| **Structured Outputs**   | Returns sources, tool calls, reflection status, and trace information                    |
 
 ---
 
@@ -115,30 +163,54 @@ flowchart TD
 
 ---
 
-## Current Local Workflow
+## Agentic RAG Sequence
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant API as FastAPI
-    participant Supervisor
-    participant RAG as Retrieval Layer
+    participant API as FastAPI API Gateway
+    participant Supervisor as Supervisor Agent
+    participant Rewrite as Query Rewrite Agent
+    participant Retrieval as Retrieval Agent
     participant Tools as Tool Registry
     participant LLM as Local LLM
+    participant Reflect as Reflection Agent
     participant Trace as Trace Logger
 
     User->>API: Ask insurance question
     API->>Supervisor: Start agentic workflow
-    Supervisor->>LLM: Rewrite query
-    Supervisor->>RAG: Retrieve relevant chunks
-    Supervisor->>Tools: Run insurance tools
-    Tools-->>Supervisor: Structured tool results
-    Supervisor->>LLM: Generate grounded answer
-    Supervisor->>LLM: Reflect on answer
+    Supervisor->>Rewrite: Rewrite query for retrieval
+    Rewrite->>LLM: Generate better search query
+    LLM-->>Rewrite: Rewritten query
+    Rewrite-->>Supervisor: Return rewritten query
+    Supervisor->>Retrieval: Search indexed policy chunks
+    Retrieval-->>Supervisor: Return relevant chunks
+    Supervisor->>Tools: Execute insurance tools
+    Tools-->>Supervisor: Return structured tool results
+    Supervisor->>LLM: Generate grounded answer from sources and tools
+    LLM-->>Supervisor: Draft answer
+    Supervisor->>Reflect: Check grounding and risk
+    Reflect->>LLM: Critique answer
+    LLM-->>Reflect: Reflection result
+    Reflect-->>Supervisor: Approval or review status
     Supervisor->>Trace: Save workflow trace
-    Supervisor-->>API: Final answer with sources and tool calls
+    Supervisor-->>API: Final answer with sources, tools, reflection, and trace
     API-->>User: JSON response
 ```
+
+---
+
+## Agent Roles
+
+| Agent                   | Responsibility                                                      |
+| ----------------------- | ------------------------------------------------------------------- |
+| **Supervisor Agent**    | Owns the workflow and decides what steps happen                     |
+| **Query Rewrite Agent** | Rewrites vague user questions into retrieval-friendly queries       |
+| **Retrieval Agent**     | Searches document chunks using semantic similarity                  |
+| **Tool Calling Agent**  | Executes approved tools from the registry                           |
+| **Answer Agent**        | Generates the final answer using retrieved context and tool outputs |
+| **Reflection Agent**    | Reviews whether the answer is grounded and safe                     |
+| **Trace Logger**        | Saves the full execution path for debugging and auditability        |
 
 ---
 
@@ -146,18 +218,9 @@ sequenceDiagram
 
 The project uses a **controlled tool registry**.
 
-A tool registry is a catalogue of approved backend functions the agent is allowed to call. This prevents the model from taking uncontrolled actions.
+A **tool** is a backend function the agent can call to perform a specific task.
 
-Current tools:
-
-| Tool                  | Purpose                                                                  |
-| --------------------- | ------------------------------------------------------------------------ |
-| `coverage_check_tool` | Checks whether the claim appears related to covered events or exclusions |
-| `evidence_check_tool` | Identifies likely claim evidence requirements                            |
-| `fraud_signal_tool`   | Detects simple fraud indicators from claim wording                       |
-| `human_review_tool`   | Decides whether the case should be escalated                             |
-
-Each tool has:
+A **tool registry** is a catalogue of approved tools. Each registered tool has:
 
 ```text
 name
@@ -168,9 +231,20 @@ structured output
 trace log entry
 ```
 
+This prevents the model from taking uncontrolled actions.
+
+Current tools:
+
+| Tool                  | Purpose                                                                      |
+| --------------------- | ---------------------------------------------------------------------------- |
+| `coverage_check_tool` | Checks whether claim wording appears related to covered events or exclusions |
+| `evidence_check_tool` | Identifies likely evidence required for assessment                           |
+| `fraud_signal_tool`   | Detects simple fraud indicators from claim wording                           |
+| `human_review_tool`   | Decides whether the case should be escalated                                 |
+
 ---
 
-## Retrieval Augmented Generation Pipeline
+## Retrieval and Chunking Pipeline
 
 ```mermaid
 flowchart LR
@@ -182,55 +256,101 @@ flowchart LR
     F --> G[Create Embeddings]
     G --> H[Vector Index]
     H --> I[Semantic Search]
-    I --> J[Grounded Answer]
+    I --> J[Agentic RAG Workflow]
 ```
 
-The current RAG pipeline supports:
+The current document pipeline supports:
 
-* Document ingestion
-* Text extraction
-* Text cleaning
-* Token estimation
-* Chunking with overlap
-* Metadata tracking
-* Local embedding generation
-* Semantic vector search
-* Grounded answer generation
+* document ingestion
+* text extraction
+* text cleaning
+* token estimation
+* chunking with overlap
+* metadata tracking
+* local embedding generation
+* local vector indexing
+* semantic search
+* grounded answer generation
+* agentic orchestration on top of retrieved results
+
+---
+
+## Why Chunking Matters
+
+Long insurance documents cannot be sent to a Large Language Model all at once.
+
+The system breaks documents into smaller chunks and adds overlap between chunks.
+Overlap helps preserve meaning when important policy clauses sit across chunk boundaries.
+
+Each chunk stores:
+
+```text
+document ID
+chunk ID
+chunk index
+source filename
+text
+estimated token count
+metadata
+```
+
+This makes retrieval more accurate and improves traceability.
 
 ---
 
 ## API Endpoints
 
-| Endpoint                   | Purpose                                    |
-| -------------------------- | ------------------------------------------ |
-| `GET /`                    | Basic API status                           |
-| `GET /health`              | Dependency health check                    |
-| `POST /llm/test`           | Test local Large Language Model generation |
-| `POST /documents/ingest`   | Upload and chunk a document                |
-| `POST /rag/index`          | Convert chunks into embeddings             |
-| `POST /rag/search`         | Search indexed document chunks             |
-| `POST /rag/answer`         | Generate a grounded RAG answer             |
-| `GET /tools/list`          | List available tools                       |
-| `POST /tools/execute`      | Execute a registered tool                  |
-| `POST /agentic/rag-answer` | Run the full agentic RAG workflow          |
+| Endpoint                   | Purpose                                      |
+| -------------------------- | -------------------------------------------- |
+| `GET /`                    | Basic API status                             |
+| `GET /health`              | Dependency health check                      |
+| `POST /llm/test`           | Test local Large Language Model generation   |
+| `POST /documents/ingest`   | Upload, clean, and chunk a document          |
+| `POST /rag/index`          | Convert chunks into embeddings               |
+| `POST /rag/search`         | Search indexed document chunks               |
+| `POST /rag/answer`         | Generate a basic grounded RAG answer         |
+| `GET /tools/list`          | List available tools                         |
+| `POST /tools/execute`      | Execute a registered tool                    |
+| `POST /agentic/rag-answer` | Run the full Agentic RAG supervisor workflow |
+
+---
+
+## Main Endpoint
+
+The main project endpoint is:
+
+```text
+POST /agentic/rag-answer
+```
+
+This endpoint runs the full Agentic RAG workflow:
+
+```text
+query rewrite
+semantic retrieval
+tool calling
+grounded answer generation
+reflection
+trace logging
+```
 
 ---
 
 ## Technology Stack
 
-| Layer                    | Technology                            |
-| ------------------------ | ------------------------------------- |
-| Backend API              | FastAPI                               |
-| Local model serving      | Ollama                                |
-| Language model interface | Local HTTP API                        |
-| Embeddings               | Local embedding model                 |
-| Vector search            | Local vector index for MVP            |
-| Future vector database   | Qdrant                                |
-| Short-term memory        | Redis planned                         |
-| Persistent storage       | PostgreSQL planned                    |
-| Containerisation         | Docker Compose planned                |
-| Observability            | Trace logs now, OpenTelemetry planned |
-| Frontend                 | Planned                               |
+| Layer                  | Technology                            |
+| ---------------------- | ------------------------------------- |
+| Backend API            | FastAPI                               |
+| Local model serving    | Ollama                                |
+| LLM access             | Local HTTP API                        |
+| Embeddings             | Local embedding model                 |
+| Vector search          | Local vector index for MVP            |
+| Future vector database | Qdrant                                |
+| Short-term memory      | Redis planned                         |
+| Persistent storage     | PostgreSQL planned                    |
+| Containerisation       | Docker Compose planned                |
+| Observability          | Trace logs now, OpenTelemetry planned |
+| Frontend               | Planned                               |
 
 ---
 
@@ -252,14 +372,30 @@ insurance-aigents.com/
         requirements.txt
         run_local_api.py
 
-    data/
-        uploads/
-        indexes/
-        logs/
-
     docs/
     docker-compose.yml
     README.md
+```
+
+Generated local data is intentionally excluded from GitHub:
+
+```text
+data/uploads/
+data/indexes/
+data/logs/
+```
+
+---
+
+## Example Agentic Request
+
+```json
+{
+  "query": "The customer has windscreen damage after a storm. Is it covered and what evidence is required?",
+  "document_id": null,
+  "top_k": 3,
+  "max_loops": 2
+}
 ```
 
 ---
@@ -270,10 +406,21 @@ insurance-aigents.com/
 {
   "query": "The customer has windscreen damage after a storm. Is it covered and what evidence is required?",
   "rewritten_query": "windscreen storm damage insurance coverage evidence requirements",
+  "answer": "Windscreen damage may be covered when comprehensive cover is active. The claim may require photographs, an incident description, repair quote, and policy details. The response is based on the retrieved policy chunk and structured tool outputs.",
   "status": "approved",
   "llm_model": "llama3.1:8b",
   "embedding_model": "nomic-embed-text",
   "total_sources_used": 1,
+  "sources": [
+    {
+      "document_id": "example-document-id",
+      "chunk_id": "example-document-id_chunk_0001",
+      "chunk_index": 1,
+      "score": 0.82,
+      "source_filename": "sample_policy.txt",
+      "text": "Windscreen damage is covered when the insured vehicle has comprehensive cover active at the time of the incident."
+    }
+  ],
   "tool_calls": [
     {
       "tool_name": "coverage_check_tool",
@@ -289,8 +436,25 @@ insurance-aigents.com/
         "required_evidence": [
           "incident description",
           "photographs of damage",
-          "repair invoice or quote"
+          "repair invoice or quote",
+          "policy number",
+          "windscreen repair or replacement quote"
         ]
+      }
+    },
+    {
+      "tool_name": "fraud_signal_tool",
+      "ok": true,
+      "result": {
+        "fraud_risk_level": "low",
+        "fraud_risk_score": 0
+      }
+    },
+    {
+      "tool_name": "human_review_tool",
+      "ok": true,
+      "result": {
+        "human_review_required": false
       }
     }
   ],
@@ -298,7 +462,9 @@ insurance-aigents.com/
     "approved": true,
     "risk_level": "low",
     "human_review_required": false
-  }
+  },
+  "trace_id": "example-trace-id",
+  "loop_count": 1
 }
 ```
 
@@ -306,14 +472,15 @@ insurance-aigents.com/
 
 ## What Makes This Different From A Chatbot
 
-| Chatbot                   | InsuranceAIGents.com                    |
-| ------------------------- | --------------------------------------- |
-| Answers directly          | Retrieves evidence first                |
-| No controlled tools       | Uses an approved tool registry          |
-| Hard to audit             | Saves trace logs                        |
-| May hallucinate           | Uses grounded context and reflection    |
-| One model does everything | Supervisor coordinates specialist steps |
-| No escalation logic       | Supports human review decisioning       |
+| Chatbot                   | InsuranceAIGents.com                                |
+| ------------------------- | --------------------------------------------------- |
+| Answers directly          | Runs a supervised Agentic RAG workflow              |
+| No retrieval control      | Uses query rewriting and semantic retrieval         |
+| No controlled tools       | Uses an approved tool registry                      |
+| Hard to audit             | Saves trace logs                                    |
+| May hallucinate           | Uses grounded context, tool outputs, and reflection |
+| One model does everything | Supervisor coordinates specialist agents            |
+| No escalation logic       | Supports human review decisioning                   |
 
 ---
 
@@ -355,6 +522,7 @@ mindmap
     Governance
       Input guardrails
       Output validation
+      Business domain checks
       Human approval workflows
       Audit events
     Memory
@@ -378,15 +546,16 @@ mindmap
       Prompt versioning
       Evaluation datasets
       Reflection scoring
+      Agent workflow optimisation
 ```
 
 ---
 
 ## Local Setup
 
-> This project is currently designed as a local-first MVP.
+This project is currently designed as a local-first MVP.
 
-Install backend dependencies:
+Create and activate a Python virtual environment:
 
 ```bash
 cd backend
@@ -401,6 +570,22 @@ Open API docs:
 ```text
 http://127.0.0.1:8000/docs
 ```
+
+---
+
+## Local Model Setup
+
+The local development version uses Ollama.
+
+Example models:
+
+```bash
+ollama pull llama3.1:8b
+ollama pull nomic-embed-text
+```
+
+`llama3.1:8b` is used for local text generation.
+`nomic-embed-text` is used for local embeddings.
 
 ---
 
@@ -426,17 +611,32 @@ The public repository should contain source code, documentation, configuration t
 
 ---
 
+## Engineering Principles
+
+This project is built around the following principles:
+
+* agent-first workflow design
+* retrieval before generation
+* controlled tool calling
+* source-grounded responses
+* human review for uncertain or risky outputs
+* traceable execution
+* local-first experimentation
+* clean migration path to cloud infrastructure
+
+---
+
 ## Interview Positioning
 
 This project demonstrates hands-on capability across:
 
 * Agentic AI system design
+* Agentic Retrieval Augmented Generation
 * Multi-step orchestration
-* Retrieval Augmented Generation
+* Supervisor and worker agent patterns
+* Tool calling through a controlled registry
 * Context engineering
-* Tool calling
 * Local model serving
-* Controlled AI workflows
 * Human review patterns
 * Traceability and auditability
 * Insurance-domain AI decision support
