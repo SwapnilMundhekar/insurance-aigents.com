@@ -92,7 +92,7 @@ def redact_pii(query):
     redacted = query
     redacted = re.sub(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", "[REDACTED_EMAIL]", redacted)
     redacted = re.sub(r"\b(?:\+?61|0)[\d\s\-]{8,15}\b", "[REDACTED_PHONE]", redacted)
-    redacted = re.sub(r"\b(?:POL|CLAIM|CUST|REF)[-_: ]?[A-Za-z0-9]{5,}\b", "[REDACTED_REFERENCE_ID]", redacted, flags=re.IGNORECASE)
+    redacted = re.sub(r"\b(?:POL|CLAIM|CUST|REF)[-_: ]?(?=[A-Za-z0-9]*\d)[A-Za-z0-9]{5,}\b", "[REDACTED_REFERENCE_ID]", redacted, flags=re.IGNORECASE)
     return redacted
 
 def detect_pii(query):
@@ -101,7 +101,7 @@ def detect_pii(query):
         flags.append("pii_email_detected")
     if re.search(r"\b(?:\+?61|0)[\d\s\-]{8,15}\b", query):
         flags.append("pii_phone_detected")
-    if re.search(r"\b(?:POL|CLAIM|CUST|REF)[-_: ]?[A-Za-z0-9]{5,}\b", query, flags=re.IGNORECASE):
+    if re.search(r"\b(?:POL|CLAIM|CUST|REF)[-_: ]?(?=[A-Za-z0-9]*\d)[A-Za-z0-9]{5,}\b", query, flags=re.IGNORECASE):
         flags.append("pii_reference_id_detected")
     return flags
 
@@ -239,3 +239,77 @@ def analyze_prompt(query):
             "governance_version": "part_9_1_rule_based_v2"
         }
     }
+# IA_FRAUD_FILING_GUARDRAIL_V1
+# This wrapper blocks prompts that appear to ask for fraudulent or false insurance filing help.
+_original_analyze_prompt_before_fraud_filing_guardrail = analyze_prompt
+
+def _detect_fraud_filing_or_false_claim_prompt(query):
+    import re
+    text = str(query or '').lower().strip()
+    text = re.sub(r'\s+', ' ', text)
+
+    dangerous_patterns = [
+        r'\bcan\s+i\s+file\s+fraud\s+insurance\b',
+        r'\bfile\s+(a\s+)?fraud\s+insurance\b',
+        r'\bfile\s+(a\s+)?fraudulent\s+claim\b',
+        r'\bsubmit\s+(a\s+)?fraudulent\s+claim\b',
+        r'\bmake\s+(a\s+)?fake\s+claim\b',
+        r'\bsubmit\s+(a\s+)?fake\s+claim\b',
+        r'\bcreate\s+fake\s+evidence\b',
+        r'\bfake\s+insurance\s+claim\b',
+        r'\bfalse\s+insurance\s+claim\b',
+        r'\blie\s+to\s+(the\s+)?insurer\b',
+        r'\bstage\s+(an\s+)?accident\b',
+        r'\bclaim\s+for\s+damage\s+that\s+did\s+not\s+happen\b'
+    ]
+
+    for pattern in dangerous_patterns:
+        if re.search(pattern, text):
+            return True
+
+    if 'fraud insurance' in text and any(word in text for word in ['file', 'submit', 'claim', 'today', 'can i']):
+        return True
+
+    return False
+
+def analyze_prompt(query):
+    if _detect_fraud_filing_or_false_claim_prompt(query):
+        from datetime import datetime, timezone
+        original_query = str(query or '')
+        return {
+            'allowed': False,
+            'route_to': 'blocked',
+            'domain': 'insurance_operations',
+            'intent': 'illicit_or_ambiguous_fraud_filing_request',
+            'risk_flags': [
+                'fraudulent_claim_or_false_filing_attempt',
+                'insurance_misuse_safety_risk'
+            ],
+            'blocked_reasons': [
+                'The prompt appears to ask for help filing a fraudulent, false, or unclear fraud-related insurance claim.'
+            ],
+            'decomposed_tasks': [],
+            'allowed_tool_names': [],
+            'requires_human_review': True,
+            'original_character_count': len(original_query),
+            'redacted_query': original_query,
+            'governance_summary': 'Blocked. The request appears to involve fraudulent or false insurance filing. The system can help with legitimate claims or reporting suspected fraud, but not filing fraud.',
+            'metadata': {
+                'analysed_at_utc': datetime.now(timezone.utc).isoformat(),
+                'governance_version': 'fraud_filing_guardrail_v1',
+                'safe_alternative': 'Ask about filing a legitimate claim, reporting suspected fraud, or checking fraud indicators for a real claim scenario.'
+            }
+        }
+
+    return _original_analyze_prompt_before_fraud_filing_guardrail(query)
+
+# IA_FAIL_CLOSED_PREROUTER_V2
+from app.services.governance_prerouter_service import pre_route_prompt
+
+_original_analyze_prompt_before_fail_closed_prerouter = analyze_prompt
+
+def analyze_prompt(query):
+    pre_route_decision = pre_route_prompt(query)
+    if pre_route_decision is not None:
+        return pre_route_decision
+    return _original_analyze_prompt_before_fail_closed_prerouter(query)

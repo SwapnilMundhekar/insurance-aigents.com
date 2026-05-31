@@ -6,6 +6,7 @@ class AgenticRagRequest(BaseModel):
     document_id: Optional[str] = None
     top_k: int = Field(default=3, ge=1, le=10)
     max_loops: int = Field(default=2, ge=1, le=3)
+    session_id: Optional[str] = None
 
 class AgenticRagSource(BaseModel):
     document_id: str
@@ -40,9 +41,11 @@ class AgenticRagResponse(BaseModel):
     total_sources_used: int
     sources: List[AgenticRagSource]
     tool_calls: List[AgenticToolCall]
+    memory: Optional[Dict[str, Any]] = None
     governance: Dict[str, Any]
     trace_id: str
     trace_file: str
     loop_count: int
     reflection: Dict[str, Any]
+    output_guardrail: Dict[str, Any]
     steps: List[AgenticTraceStep]

@@ -16,6 +16,9 @@ from app.api.memory import router as memory_router
 from app.api.output_guardrails import router as output_guardrails_router
 from app.api.evaluations import router as evaluations_router
 from app.api.observability import router as observability_router
+from app.api.mcp_bridge import router as mcp_bridge_router
+from app.api.frontend import router as frontend_router
+from app.api.system_readiness import router as system_readiness_router
 
 app = FastAPI(
     title="InsuranceAIGents API",
@@ -40,6 +43,9 @@ app.include_router(memory_router)
 app.include_router(output_guardrails_router)
 app.include_router(evaluations_router)
 app.include_router(observability_router)
+app.include_router(mcp_bridge_router)
+app.include_router(frontend_router)
+app.include_router(system_readiness_router)
 
 @app.get("/")
 def root():

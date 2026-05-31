@@ -43,3 +43,7 @@ Thumbs.db
 
 data/audit/*
 !data/audit/.gitkeep
+data/memory/*
+!data/memory/.gitkeep
+data/evaluations/*
+!data/evaluations/.gitkeep

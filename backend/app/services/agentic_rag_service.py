@@ -4,8 +4,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from app.services.audit_service import save_agentic_workflow_audit
 from app.services.governance_service import analyze_prompt
+from app.services.memory_service import build_memory_snapshot, save_agentic_session_memory
+from app.services.output_guardrail_service import validate_agentic_output
 from app.services.llm_service import generate_with_ollama
-from app.services.tool_registry_service import execute_tool
+from app.services.mcp_client_service import execute_mcp_tool as execute_tool
 from app.services.vector_search_service import search_vector_index
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
@@ -43,6 +45,15 @@ def save_trace(trace_id, trace_payload):
 def build_blocked_response(query, governance, trace_id, steps):
     add_step(
         steps,
+        "MemoryAgent",
+        "load_session_memory",
+        safe_session_id or "no_session_id",
+        memory_snapshot.get("summary", "No session memory loaded."),
+        memory_snapshot
+    )
+
+    add_step(
+        steps,
         "InputGuardrailAgent",
         "block_request",
         governance["redacted_query"],
@@ -54,6 +65,15 @@ def build_blocked_response(query, governance, trace_id, steps):
     if governance["blocked_reasons"]:
         answer = answer + " Reason: " + "; ".join(governance["blocked_reasons"])
 
+    add_step(
+        steps,
+        "OutputGuardrailAgent",
+        "validate_final_answer",
+        answer,
+        output_guardrail.get("summary", "Output validation completed."),
+        {"risk_flags": output_guardrail.get("risk_flags", []), "final_status": output_guardrail.get("final_status", status)}
+    )
+
     response_payload = {
         "query": governance["redacted_query"],
         "rewritten_query": "",
@@ -64,6 +84,7 @@ def build_blocked_response(query, governance, trace_id, steps):
         "total_sources_used": 0,
         "sources": [],
         "tool_calls": [],
+        "memory": memory_snapshot,
         "governance": governance,
         "trace_id": trace_id,
         "trace_file": "",
@@ -73,6 +94,16 @@ def build_blocked_response(query, governance, trace_id, steps):
             "risk_level": "high",
             "human_review_required": False,
             "reason": "Request blocked by input governance before retrieval, tool calling, or LLM generation."
+        },
+        "output_guardrail": {
+            "allowed_to_return": True,
+            "final_status": "blocked",
+            "risk_flags": ["blocked_by_input_governance"],
+            "blocked_reasons": governance.get("blocked_reasons", []),
+            "required_actions": [],
+            "safe_answer": answer,
+            "summary": "Input governance blocked the request before output generation.",
+            "metadata": {}
         },
         "steps": steps
     }
@@ -85,6 +116,7 @@ def build_blocked_response(query, governance, trace_id, steps):
     trace_file = save_trace(trace_id, trace_payload)
     response_payload["trace_file"] = trace_file
     save_agentic_workflow_audit(response_payload)
+    save_agentic_session_memory(safe_session_id, response_payload)
     return response_payload
 
 def rewrite_query(original_query, steps):
@@ -297,10 +329,12 @@ def reflect_on_answer(original_query, answer, results, tool_calls, governance, s
     )
     return reflection
 
-def run_agentic_rag(query, document_id=None, top_k=3, max_loops=2):
+def run_agentic_rag(query, document_id=None, top_k=3, max_loops=2, session_id=None):
+    safe_session_id = session_id if "session_id" in locals() else None
     trace_id = str(uuid.uuid4())
     steps = []
     governance = analyze_prompt(query)
+    memory_snapshot = build_memory_snapshot(safe_session_id)
 
     add_step(
         steps,
@@ -400,7 +434,16 @@ def run_agentic_rag(query, document_id=None, top_k=3, max_loops=2):
             "text": result["text"]
         })
 
-    status = "approved" if reflection.get("approved") else "needs_review"
+    output_guardrail = validate_agentic_output(
+        answer=answer,
+        sources=final_results,
+        tool_calls=tool_calls,
+        governance=governance,
+        reflection=reflection
+    )
+
+    answer = output_guardrail["safe_answer"]
+    status = output_guardrail["final_status"]
     response_payload = {
         "query": effective_query,
         "rewritten_query": rewritten_query,
@@ -411,11 +454,13 @@ def run_agentic_rag(query, document_id=None, top_k=3, max_loops=2):
         "total_sources_used": len(sources),
         "sources": sources,
         "tool_calls": tool_calls,
+        "memory": memory_snapshot,
         "governance": governance,
         "trace_id": trace_id,
         "trace_file": "",
         "loop_count": loop_count,
         "reflection": reflection,
+        "output_guardrail": output_guardrail,
         "steps": steps
     }
 
@@ -427,4 +472,5 @@ def run_agentic_rag(query, document_id=None, top_k=3, max_loops=2):
     trace_file = save_trace(trace_id, trace_payload)
     response_payload["trace_file"] = trace_file
     save_agentic_workflow_audit(response_payload)
+    save_agentic_session_memory(safe_session_id, response_payload)
     return response_payload

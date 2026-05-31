@@ -11,7 +11,8 @@ def agentic_rag_answer(request: AgenticRagRequest):
             query=request.query,
             document_id=request.document_id,
             top_k=request.top_k,
-            max_loops=request.max_loops
+            max_loops=request.max_loops,
+            session_id=request.session_id
         )
         return AgenticRagResponse(**result)
     except FileNotFoundError as error:

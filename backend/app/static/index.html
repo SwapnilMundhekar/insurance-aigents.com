@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="dashboard-version" content="README_HOMEPAGE_CHATBOT_V8">
+  <title>InsuranceAIGents.com</title>
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: #ffffff;
+      color: #1d1d1f;
+    }
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(22px) saturate(180%);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+    .nav-inner {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand { font-weight: 760; letter-spacing: -0.03em; }
+    .nav a {
+      color: #6e6e73;
+      text-decoration: none;
+      margin-left: 22px;
+      font-size: 13px;
+    }
+    .nav a:hover { color: #1d1d1f; }
+    .hero {
+      background: linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
+      padding: 90px 24px 72px;
+      text-align: center;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .badge {
+      display: inline-flex;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(0, 113, 227, 0.08);
+      color: #0071e3;
+      font-size: 13px;
+      font-weight: 750;
+      margin-bottom: 24px;
+    }
+    h1 {
+      max-width: 1080px;
+      margin: 0 auto;
+      font-size: clamp(48px, 7vw, 98px);
+      line-height: 0.96;
+      letter-spacing: -0.075em;
+      font-weight: 850;
+    }
+    .blue {
+      background: linear-gradient(90deg, #0071e3, #5ac8fa);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .hero p {
+      max-width: 880px;
+      margin: 26px auto 0;
+      color: #6e6e73;
+      font-size: clamp(19px, 2vw, 24px);
+      line-height: 1.45;
+      letter-spacing: -0.025em;
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 34px;
+    }
+    button, .button {
+      border: 0;
+      border-radius: 999px;
+      background: #0071e3;
+      color: #ffffff;
+      padding: 12px 20px;
+      font-size: 15px;
+      font-weight: 720;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 12px 28px rgba(0, 113, 227, 0.22);
+    }
+    button.secondary, .button.secondary {
+      background: rgba(0, 113, 227, 0.08);
+      color: #0071e3;
+      box-shadow: none;
+    }
+    .shell {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 54px 24px 110px;
+    }
+    .section { margin-top: 56px; }
+    .section:first-child { margin-top: 0; }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 28px;
+      align-items: end;
+      margin-bottom: 20px;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(34px, 5vw, 60px);
+      line-height: 1;
+      letter-spacing: -0.065em;
+    }
+    .section-head p {
+      max-width: 460px;
+      margin: 0;
+      color: #6e6e73;
+      line-height: 1.5;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+    .card {
+      grid-column: span 4;
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 0 18px 46px rgba(0,0,0,0.06);
+    }
+    .card.large { grid-column: span 8; }
+    .card.full { grid-column: span 12; }
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 23px;
+      letter-spacing: -0.04em;
+    }
+    .card p, .muted { color: #6e6e73; line-height: 1.5; }
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      padding: 13px 0;
+    }
+    .metric strong {
+      font-size: 32px;
+      letter-spacing: -0.05em;
+    }
+    .metric span { color: #86868b; font-size: 13px; }
+    .flow {
+      display: grid;
+      gap: 10px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 13px;
+    }
+    .flow-step {
+      background: #f5f5f7;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 16px;
+      padding: 13px 14px;
+    }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .tag {
+      border-radius: 999px;
+      background: #f5f5f7;
+      border: 1px solid rgba(0,0,0,0.08);
+      padding: 7px 11px;
+      color: #424245;
+      font-size: 13px;
+    }
+    textarea, input {
+      width: 100%;
+      border: 1px solid rgba(0,0,0,0.11);
+      border-radius: 18px;
+      background: #ffffff;
+      color: #1d1d1f;
+      padding: 15px 16px;
+      font: inherit;
+      outline: none;
+    }
+    textarea { min-height: 136px; resize: vertical; line-height: 1.55; }
+    .row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 0.5fr;
+      gap: 12px;
+      margin: 14px 0;
+    }
+    .button-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .item {
+      background: #f5f5f7;
+      border: 1px solid rgba(0,0,0,0.07);
+      border-radius: 18px;
+      padding: 14px;
+      margin-top: 10px;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 560px;
+      overflow: auto;
+      background: #f5f5f7;
+      border: 1px solid rgba(0,0,0,0.08);
+      color: #1d1d1f;
+      border-radius: 22px;
+      padding: 18px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .chat-launcher {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: #0071e3;
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 26px;
+      box-shadow: 0 18px 42px rgba(0,113,227,0.34);
+      z-index: 100;
+    }
+    .chat-panel {
+      position: fixed;
+      right: 24px;
+      bottom: 98px;
+      width: min(420px, calc(100vw - 48px));
+      height: 590px;
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.10);
+      border-radius: 28px;
+      box-shadow: 0 28px 80px rgba(0,0,0,0.18);
+      z-index: 100;
+      display: none;
+      overflow: hidden;
+    }
+    .chat-panel.open { display: grid; grid-template-rows: auto 1fr auto; }
+    .chat-header {
+      padding: 18px;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .chat-header b { letter-spacing: -0.03em; }
+    .chat-messages {
+      padding: 16px;
+      overflow: auto;
+      background: #f5f5f7;
+    }
+    .bubble {
+      max-width: 86%;
+      padding: 12px 14px;
+      border-radius: 18px;
+      margin: 9px 0;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+    .bubble.user { margin-left: auto; background: #0071e3; color: white; }
+    .bubble.bot { background: #ffffff; border: 1px solid rgba(0,0,0,0.08); color: #1d1d1f; }
+    .chat-input {
+      padding: 14px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+    }
+    @media (max-width: 920px) {
+      .card, .card.large { grid-column: span 12; }
+      .row { grid-template-columns: 1fr; }
+      .section-head { flex-direction: column; align-items: start; }
+      .nav a { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <div class="brand">InsuranceAIGents.com</div>
+      <div>
+        <a href="#architecture">Architecture</a>
+        <a href="#capabilities">Capabilities</a>
+        <a href="#demo">Demo</a>
+        <a href="/docs" target="_blank">API Docs</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="badge">README_HOMEPAGE_CHATBOT_V8 · Local-first enterprise AI demo</div>
+    <h1>Agentic RAG platform for <span class="blue">insurance operations.</span></h1>
+    <p>InsuranceAIGents.com is a production-style AI engineering project that demonstrates governed multi-agent orchestration, policy-grounded retrieval, tool calling, memory, evaluation, audit trails, and observability for insurance workflows.</p>
+    <div class="actions">
+      <button onclick="runGovernanceOnly()">Test governance</button>
+      <button class="secondary" onclick="openChat()">Open chatbot</button>
+      <a class="button secondary" href="https://github.com/SwapnilMundhekar/insurance-aigents.com" target="_blank">GitHub repository</a>
+    </div>
+  </section>
+
+  <main class="shell">
+    <section class="section" id="architecture">
+      <div class="section-head">
+        <h2>What this project proves.</h2>
+        <p>This is not a basic chatbot. It is an end-to-end Agentic RAG system designed to show the skills expected from an AI engineering role in insurance.</p>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <h3>Problem</h3>
+          <p>Insurance teams need AI systems that can answer policy and claims questions without guessing, leaking sensitive data, ignoring guardrails, or making unsupported claim decisions.</p>
+        </div>
+        <div class="card">
+          <h3>Solution</h3>
+          <p>A governed Agentic RAG workflow that checks the prompt, retrieves policy evidence, calls approved tools, reflects on the answer, validates output safety, and logs the full trace.</p>
+        </div>
+        <div class="card">
+          <h3>Local-first build</h3>
+          <p>The system runs on a local PC using FastAPI, Ollama, document ingestion, chunking, embeddings, memory fallback, audit logs, and observability endpoints before cloud deployment.</p>
+        </div>
+        <div class="card large">
+          <h3>End-to-end flow</h3>
+          <div class="flow">
+            <div class="flow-step">1. User asks an insurance question through API or chatbot</div>
+            <div class="flow-step">2. InputGuardrailAgent checks domain, intent, prompt injection, and personal data</div>
+            <div class="flow-step">3. QueryRewriteAgent rewrites the question for retrieval</div>
+            <div class="flow-step">4. RetrievalAgent searches indexed insurance document chunks</div>
+            <div class="flow-step">5. ToolCallingAgent calls coverage, evidence, fraud, and human review tools through MCP bridge</div>
+            <div class="flow-step">6. AnswerAgent generates a grounded decision-support response</div>
+            <div class="flow-step">7. ReflectionAgent critiques reliability and risk</div>
+            <div class="flow-step">8. OutputGuardrailAgent validates the final answer before returning it</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>System status</h3>
+          <div class="metric"><strong id="apiStatus">...</strong><span>API status</span></div>
+          <div class="metric"><strong id="memoryBackend">...</strong><span>memory backend</span></div>
+          <div class="metric"><strong id="traceCount">0</strong><span>traces</span></div>
+          <button onclick="loadSystem()">Refresh status</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="capabilities">
+      <div class="section-head">
+        <h2>Capabilities.</h2>
+        <p>These are the same capabilities that should be highlighted in the GitHub README and interview explanation.</p>
+      </div>
+      <div class="grid">
+        <div class="card"><h3>Governance</h3><p>Business domain routing, intent classification, prompt injection blocking, personal data redaction, and allowed tool mapping.</p></div>
+        <div class="card"><h3>Document intelligence</h3><p>PDF readability checks, OCR decision layer, semantic chunking, page metadata, section detection, and source traceability.</p></div>
+        <div class="card"><h3>Agentic RAG</h3><p>Supervisor workflow with query rewriting, retrieval, tool calling, answer generation, reflection, and output validation.</p></div>
+        <div class="card"><h3>MCP tool bridge</h3><p>Approved tools are exposed through an MCP-style bridge for coverage checks, evidence requirements, fraud signals, and human review decisions.</p></div>
+        <div class="card"><h3>Memory and audit</h3><p>Session working memory, SQLite audit persistence, workflow traces, tool call history, retrieval sources, and review status.</p></div>
+        <div class="card"><h3>Evaluation and observability</h3><p>Evaluation cases for guardrails and output safety, observability summaries, trace analytics, risk counts, and tool usage metrics.</p></div>
+      </div>
+      <div class="tag-row">
+        <span class="tag">FastAPI</span>
+        <span class="tag">Ollama</span>
+        <span class="tag">Llama 3.1 8B</span>
+        <span class="tag">nomic-embed-text</span>
+        <span class="tag">Agentic RAG</span>
+        <span class="tag">MCP</span>
+        <span class="tag">Qdrant-ready</span>
+        <span class="tag">SQLite audit</span>
+        <span class="tag">Redis-ready memory</span>
+        <span class="tag">Output guardrails</span>
+      </div>
+    </section>
+
+    <section class="section" id="demo">
+      <div class="section-head">
+        <h2>Live demo.</h2>
+        <p>Use the controls below to test governance, Agentic RAG, MCP tools, evaluations, and traces.</p>
+      </div>
+      <div class="grid">
+        <div class="card large">
+          <h3>Ask Agentic RAG</h3>
+          <p class="muted">This sends the question through the governed agent workflow.</p>
+          <textarea id="ragQuery">The customer has windscreen damage after a storm. Is it covered and what evidence is required?</textarea>
+          <div class="row">
+            <input id="documentId" placeholder="document_id optional">
+            <input id="sessionId" value="demo-session-1" placeholder="session_id">
+            <input id="topK" type="number" value="3" min="1" max="10">
+          </div>
+          <div class="button-row">
+            <button onclick="runAgenticRag()">Run Agentic RAG</button>
+            <button class="secondary" onclick="runGovernanceOnly()">Governance only</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>MCP tools</h3>
+          <p class="muted">View approved tools exposed through the MCP bridge.</p>
+          <button onclick="loadMcpTools()">Load MCP tools</button>
+          <div id="toolPills"></div>
+        </div>
+        <div class="card">
+          <h3>Evaluations</h3>
+          <p class="muted">Run safe tests for governance and output guardrails.</p>
+          <button onclick="runEvaluations()">Run evaluations</button>
+          <div id="evalSummary"></div>
+        </div>
+        <div class="card full">
+          <h3>Result</h3>
+          <pre id="resultBox">Waiting for action...</pre>
+        </div>
+        <div class="card full">
+          <h3>Recent traces</h3>
+          <button onclick="loadTraces()">Load traces</button>
+          <div id="traceList"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <button class="chat-launcher" onclick="toggleChat()">💬</button>
+  <section id="chatPanel" class="chat-panel">
+    <div class="chat-header">
+      <div><b>Insurance AI Assistant</b><br><span class="muted">Agentic RAG chatbot</span></div>
+      <button class="secondary" onclick="toggleChat()">Close</button>
+    </div>
+    <div id="chatMessages" class="chat-messages">
+      <div class="bubble bot">Hi, I can answer insurance policy questions using the governed Agentic RAG workflow. Try asking about windscreen damage, evidence requirements, exclusions, or human review.</div>
+    </div>
+    <div class="chat-input">
+      <input id="chatInput" placeholder="Ask an insurance question...">
+      <button onclick="sendChat()">Send</button>
+    </div>
+  </section>
+
+  <script>
+    function pretty(value) { return JSON.stringify(value, null, 2); }
+    function setResult(value) { document.getElementById('resultBox').textContent = typeof value === 'string' ? value : pretty(value); }
+    async function getJson(path) {
+      const res = await fetch(path, { cache: 'no-store' });
+      if (!res.ok) throw new Error(await res.text());
+      return await res.json();
+    }
+    async function postJson(path, body) {
+      const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), cache: 'no-store' });
+      if (!res.ok) throw new Error(await res.text());
+      return await res.json();
+    }
+    async function loadSystem() {
+      try {
+        const root = await getJson('/');
+        const memory = await getJson('/memory/status');
+        const obs = await getJson('/observability/summary');
+        document.getElementById('apiStatus').textContent = root.status || 'running';
+        document.getElementById('memoryBackend').textContent = memory.backend;
+        document.getElementById('traceCount').textContent = obs.total_traces;
+        setResult({ root: root, memory: memory, observability: obs });
+      } catch (err) { setResult(String(err)); }
+    }
+    async function loadObservability() {
+      try { setResult(await getJson('/observability/summary')); } catch (err) { setResult(String(err)); }
+    }
+    async function loadMcpTools() {
+      try {
+        const data = await getJson('/mcp/tools');
+        const tools = data.tools || [];
+        document.getElementById('toolPills').innerHTML = tools.map(function(t) { return '<div class="item"><b>' + t.name + '</b><br><span class="muted">' + t.description + '</span></div>'; }).join('');
+        setResult(data);
+      } catch (err) { setResult(String(err)); }
+    }
+    async function runGovernanceOnly() {
+      try {
+        const query = document.getElementById('ragQuery').value;
+        setResult(await postJson('/governance/analyze', { query: query }));
+      } catch (err) { setResult(String(err)); }
+    }
+    async function runAgenticRag() {
+      try {
+        const query = document.getElementById('ragQuery').value;
+        const documentId = document.getElementById('documentId').value.trim();
+        const sessionId = document.getElementById('sessionId').value.trim();
+        const topK = Number(document.getElementById('topK').value || 3);
+        const data = await postJson('/agentic/rag-answer', { query: query, document_id: documentId || null, top_k: topK, max_loops: 2, session_id: sessionId || null });
+        setResult(data);
+        await loadTraces();
+      } catch (err) { setResult(String(err)); }
+    }
+    async function runEvaluations() {
+      try {
+        const data = await postJson('/evaluations/run', { include_agentic_cases: false, document_id: null, top_k: 3, max_loops: 2 });
+        document.getElementById('evalSummary').innerHTML = '<div class="item"><b>Pass rate:</b> ' + Math.round(data.pass_rate * 100) + '%<br><span class="muted">' + data.passed_cases + '/' + data.total_cases + ' passed</span></div>';
+        setResult(data);
+      } catch (err) { setResult(String(err)); }
+    }
+    async function loadTraces() {
+      try {
+        const data = await getJson('/observability/traces?limit=10');
+        const traces = data.traces || [];
+        document.getElementById('traceList').innerHTML = traces.map(function(t) { return '<div class="item"><b>' + t.status + '</b><br><span class="muted">' + t.trace_id + '</span><br>' + t.query_preview + '</div>'; }).join('');
+        setResult(data);
+      } catch (err) { setResult(String(err)); }
+    }
+    function toggleChat() { document.getElementById('chatPanel').classList.toggle('open'); }
+    function openChat() { document.getElementById('chatPanel').classList.add('open'); }
+    function addBubble(role, text) {
+      const box = document.getElementById('chatMessages');
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble ' + role;
+      bubble.textContent = text;
+      box.appendChild(bubble);
+      box.scrollTop = box.scrollHeight;
+    }
+    function isVagueInsuranceQuestion(message) {
+      const text = message.trim().toLowerCase();
+      const words = text.split(/\s+/).filter(Boolean);
+      const vagueExact = [
+        'insurance',
+        'insurance?',
+        'policy',
+        'policy?',
+        'claim',
+        'claim?',
+        'coverage',
+        'coverage?',
+        'what is insurance?',
+        'what is covered?',
+        'what is covered under insurance?'
+      ];
+      if (vagueExact.includes(text)) return true;
+      if (words.length <= 3 && (text.includes('insurance') || text.includes('policy') || text.includes('claim') || text.includes('covered'))) return true;
+      return false;
+    }
+
+    function clarificationMessage(message) {
+      const text = message.trim().toLowerCase();
+      if (text.includes('covered') || text.includes('coverage')) {
+        return 'Which policy type and incident are you asking about? For example:\n\n• Motor insurance: windscreen damage after a storm\n• Home insurance: water damage from a burst pipe\n• Travel insurance: cancelled trip due to illness\n\nAsk a specific question and I will run the governed Agentic RAG workflow.';
+      }
+      return 'Please ask a more specific insurance operations question. I can help with:\n\n• Policy coverage\n• Required claim evidence\n• Exclusions\n• Fraud indicators\n• Human review escalation\n\nExample: The customer has windscreen damage after a storm. Is it covered and what evidence is required?';
+    }
+    function isTopicOnlyInsuranceQuestion(message) {
+      const text = message.trim().toLowerCase().replace(/[?.!]+$/g, '');
+      const compact = text.replace(/\s+/g, ' ');
+      const topicOnly = [
+        'fraud indicators',
+        'fraud indicator',
+        'fraud signals',
+        'fraud signal',
+        'evidence requirements',
+        'required evidence',
+        'claim evidence',
+        'policy coverage',
+        'coverage check',
+        'exclusions',
+        'exclusion',
+        'human review',
+        'manual review',
+        'claim triage',
+        'claims triage',
+        'risk assessment',
+        'claim assessment'
+      ];
+      if (topicOnly.includes(compact)) return true;
+      const words = compact.split(' ').filter(Boolean);
+      if (words.length <= 3) {
+        const topicWords = ['fraud', 'evidence', 'coverage', 'covered', 'exclusions', 'review', 'triage', 'claim', 'policy'];
+        return topicWords.some(function(word) { return compact.includes(word); });
+      }
+      return false;
+    }
+
+    function topicClarificationMessage(message) {
+      const text = message.trim().toLowerCase();
+      if (text.includes('fraud')) {
+        return 'To check fraud indicators, please describe the claim scenario.\n\nExample:\nThe customer lodged a second windscreen claim within 3 weeks and the damage description is inconsistent with the photos. What fraud indicators should be checked?';
+      }
+      if (text.includes('evidence')) {
+        return 'To identify required evidence, please describe the incident and policy type.\n\nExample:\nThe customer has windscreen damage after a storm. What evidence is required for assessment?';
+      }
+      if (text.includes('coverage') || text.includes('covered')) {
+        return 'To check coverage, please describe the policy type and incident.\n\nExample:\nThe customer has comprehensive motor insurance and windscreen damage after a storm. Is it covered?';
+      }
+      if (text.includes('exclusion')) {
+        return 'To check exclusions, please describe the incident.\n\nExample:\nThe vehicle has mechanical failure after normal use. What exclusions may apply?';
+      }
+      if (text.includes('review')) {
+        return 'To decide whether human review is required, please describe the claim details, evidence quality, and any risk indicators.\n\nExample:\nThe claim has missing photos and inconsistent incident descriptions. Should it be escalated for human review?';
+      }
+      return 'Please describe a specific insurance scenario so I can run the governed Agentic RAG workflow.\n\nExample:\nThe customer has windscreen damage after a storm. Is it covered and what evidence is required?';
+    }
+    function isFraudFilingOrFalseClaimQuestion(message) {
+      const text = message.trim().toLowerCase().replace(/\s+/g, ' ');
+      const dangerousPatterns = [
+        /\bcan\s+i\s+file\s+fraud\s+insurance\b/,
+        /\bfile\s+(a\s+)?fraud\s+insurance\b/,
+        /\bfile\s+(a\s+)?fraudulent\s+claim\b/,
+        /\bsubmit\s+(a\s+)?fraudulent\s+claim\b/,
+        /\bmake\s+(a\s+)?fake\s+claim\b/,
+        /\bsubmit\s+(a\s+)?fake\s+claim\b/,
+        /\bcreate\s+fake\s+evidence\b/,
+        /\bfake\s+insurance\s+claim\b/,
+        /\bfalse\s+insurance\s+claim\b/,
+        /\blie\s+to\s+(the\s+)?insurer\b/,
+        /\bstage\s+(an\s+)?accident\b/
+      ];
+      if (dangerousPatterns.some(function(pattern) { return pattern.test(text); })) return true;
+      if (text.includes('fraud insurance') && ['file', 'submit', 'claim', 'today', 'can i'].some(function(word) { return text.includes(word); })) return true;
+      return false;
+    }
+
+    function fraudFilingSafetyMessage() {
+      return 'I cannot help with filing a fraudulent, false, or misleading insurance claim.\n\nIf you mean filing a legitimate claim, please describe the real incident, policy type, damage or loss, and available evidence.\n\nIf you mean reporting suspected fraud, describe the suspicious claim behaviour and I can help identify fraud indicators or human review triggers.';
+    }
+    function getToolResultV7(data, toolName) {
+      const calls = data.tool_calls || [];
+      for (const call of calls) {
+        if (call.tool_name === toolName) return call.result || {};
+      }
+      return {};
+    }
+
+    function sentenceCaseV7(value) {
+      if (!value) return '';
+      return String(value).replace(/_/g, ' ').replace(/\b\w/g, function(ch) { return ch.toUpperCase(); });
+    }
+
+    function buildFriendlyChatbotAnswerV7(data) {
+      const governance = data.governance || {};
+      const output = data.output_guardrail || {};
+      const coverage = getToolResultV7(data, 'coverage_check_tool');
+      const evidence = getToolResultV7(data, 'evidence_check_tool');
+      const fraud = getToolResultV7(data, 'fraud_signal_tool');
+      const review = getToolResultV7(data, 'human_review_tool');
+      const lines = [];
+
+      if (output.final_status === 'blocked') {
+        return 'I cannot return this answer because output guardrails blocked it. Human review is required.';
+      }
+
+      if (coverage.coverage_status) {
+        const status = sentenceCaseV7(coverage.coverage_status);
+        if (coverage.coverage_status.includes('potential')) {
+          lines.push('This may be covered based on the retrieved policy context, but it is not a final claim decision.');
+        } else if (coverage.coverage_status.includes('unknown')) {
+          lines.push('I do not have enough clear policy context to confirm coverage.');
+        } else {
+          lines.push('Coverage status: ' + status + '.');
+        }
+      } else if (data.answer) {
+        lines.push(String(data.answer).split('Source chunk IDs')[0].split('Tool names used')[0].trim());
+      }
+
+      if (evidence.required_evidence && evidence.required_evidence.length) {
+        lines.push('\nLikely evidence needed:');
+        evidence.required_evidence.slice(0, 6).forEach(function(item) {
+          lines.push('• ' + item);
+        });
+      }
+
+      if (fraud.fraud_risk_level) {
+        lines.push('\nFraud risk: ' + sentenceCaseV7(fraud.fraud_risk_level) + '.');
+        if (fraud.fraud_signals && fraud.fraud_signals.length) {
+          lines.push('Detected fraud indicators:');
+          fraud.fraud_signals.forEach(function(item) { lines.push('• ' + item); });
+        }
+      }
+
+      if (review.human_review_required === true) {
+        lines.push('\nHuman review is required before this is treated as a final decision.');
+      } else if (review.human_review_required === false) {
+        lines.push('\nHuman review was not triggered by the current rule checks.');
+      }
+
+      if (data.sources && data.sources.length) {
+        const first = data.sources[0];
+        const name = first.source_filename || 'the indexed policy document';
+        lines.push('\nBased on: ' + name + '.');
+      }
+
+      lines.push('\nThis is decision support only. A final claim outcome should follow the insurer’s assessment process.');
+      return lines.join('\n');
+    }
+    async function sendChat() {
+      const input = document.getElementById('chatInput');
+      const message = input.value.trim();
+      if (!message) return;
+      input.value = '';
+      addBubble('user', message);
+      addBubble('bot', 'Checking governance...');
+      try {
+        const governance = await postJson('/governance/analyze', { query: message });
+        const messages = document.getElementById('chatMessages');
+
+        if (governance.route_to === 'clarification_required') {
+          messages.lastChild.textContent = governance.metadata && governance.metadata.suggested_message ? governance.metadata.suggested_message : governance.governance_summary;
+          setResult(governance);
+          return;
+        }
+
+        if (!governance.allowed || governance.route_to === 'blocked') {
+          messages.lastChild.textContent = governance.governance_summary || 'This request was blocked by governance and will not be routed to Agentic RAG.';
+          setResult(governance);
+          return;
+        }
+
+        messages.lastChild.textContent = 'Checking local system readiness...';
+        const readiness = await getJson('/system/readiness');
+
+        if (!readiness.ollama_available) {
+          messages.lastChild.textContent = 'The insurance question passed governance, but the local Ollama model service is not running. Start Ollama with: ollama serve. Then make sure llama3.1:8b and nomic-embed-text are installed.';
+          setResult({ governance: governance, readiness: readiness });
+          return;
+        }
+
+        if (!readiness.indexed_documents_available) {
+          messages.lastChild.textContent = 'The insurance question passed governance, but no indexed policy documents were found. Upload or ingest a policy document first, then run the RAG index step.';
+          setResult({ governance: governance, readiness: readiness });
+          return;
+        }
+
+        messages.lastChild.textContent = 'Running governed Agentic RAG...';
+        const data = await postJson('/agentic/rag-answer', {
+          query: message,
+          document_id: null,
+          top_k: 3,
+          max_loops: 2,
+          session_id: 'chatbot-session'
+        });
+
+        messages.lastChild.textContent = buildFriendlyChatbotAnswerV7(data);
+        setResult(data);
+      } catch (err) {
+        const messages = document.getElementById('chatMessages');
+        const errorText = String(err);
+        if (errorText.includes('WinError 10061') || errorText.includes('connection') || errorText.includes('refused')) {
+          messages.lastChild.textContent = 'The local AI service is offline. Start Ollama with: ollama serve. Then try again.';
+        } else {
+          messages.lastChild.textContent = 'The chatbot could not complete the request safely. Check the Result panel for details.';
+        }
+        setResult({ error: errorText });
+      }
+    }
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter' && document.activeElement && document.activeElement.id === 'chatInput') {
+        sendChat();
+      }
+    });
+    loadSystem();
+    loadMcpTools();
+  </script>
+</body>
+</html>
