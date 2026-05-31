@@ -12,6 +12,10 @@ from app.api.pdf_ocr import router as pdf_ocr_router
 from app.api.semantic_ingestion import router as semantic_ingestion_router
 from app.api.qdrant_rag import router as qdrant_rag_router
 from app.api.audit import router as audit_router
+from app.api.memory import router as memory_router
+from app.api.output_guardrails import router as output_guardrails_router
+from app.api.evaluations import router as evaluations_router
+from app.api.observability import router as observability_router
 
 app = FastAPI(
     title="InsuranceAIGents API",
@@ -32,6 +36,10 @@ app.include_router(pdf_ocr_router)
 app.include_router(semantic_ingestion_router)
 app.include_router(qdrant_rag_router)
 app.include_router(audit_router)
+app.include_router(memory_router)
+app.include_router(output_guardrails_router)
+app.include_router(evaluations_router)
+app.include_router(observability_router)
 
 @app.get("/")
 def root():
