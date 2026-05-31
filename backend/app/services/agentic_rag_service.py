@@ -2,6 +2,7 @@ import json
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
+from app.services.audit_service import save_agentic_workflow_audit
 from app.services.governance_service import analyze_prompt
 from app.services.llm_service import generate_with_ollama
 from app.services.tool_registry_service import execute_tool
@@ -83,6 +84,7 @@ def build_blocked_response(query, governance, trace_id, steps):
     }
     trace_file = save_trace(trace_id, trace_payload)
     response_payload["trace_file"] = trace_file
+    save_agentic_workflow_audit(response_payload)
     return response_payload
 
 def rewrite_query(original_query, steps):
@@ -424,4 +426,5 @@ def run_agentic_rag(query, document_id=None, top_k=3, max_loops=2):
     }
     trace_file = save_trace(trace_id, trace_payload)
     response_payload["trace_file"] = trace_file
+    save_agentic_workflow_audit(response_payload)
     return response_payload

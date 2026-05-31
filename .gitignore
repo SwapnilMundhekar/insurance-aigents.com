@@ -1,15 +1,45 @@
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Environments and secrets
 .env
+.env.*
+!.env.example
 .venv/
 venv/
+
+# Node and frontend
 node_modules/
 .next/
 dist/
 build/
+
+# Local generated project data
 data/uploads/*
 data/indexes/*
 data/logs/*
+data/test_documents/*
 !data/uploads/.gitkeep
 !data/indexes/.gitkeep
 !data/logs/.gitkeep
+
+# Temporary setup and repair scripts
+setup_part*.py
+fix_*.py
+
+# Logs
+*.log
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+data/audit/*
+!data/audit/.gitkeep
