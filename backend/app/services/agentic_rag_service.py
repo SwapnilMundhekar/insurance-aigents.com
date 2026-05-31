@@ -2,6 +2,7 @@ import json
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
+from app.services.governance_service import analyze_prompt
 from app.services.llm_service import generate_with_ollama
 from app.services.tool_registry_service import execute_tool
 from app.services.vector_search_service import search_vector_index
@@ -32,9 +33,61 @@ def add_step(steps, agent_name, action, input_summary, output_summary, metadata=
     steps.append(step)
     return step
 
+def save_trace(trace_id, trace_payload):
+    ensure_log_dir()
+    trace_file = LOG_DIR / f"agentic_trace_{trace_id}.json"
+    trace_file.write_text(json.dumps(trace_payload, indent=2), encoding="utf-8")
+    return f"data/logs/{trace_file.name}"
+
+def build_blocked_response(query, governance, trace_id, steps):
+    add_step(
+        steps,
+        "InputGuardrailAgent",
+        "block_request",
+        governance["redacted_query"],
+        governance["governance_summary"],
+        {"risk_flags": governance["risk_flags"], "blocked_reasons": governance["blocked_reasons"]}
+    )
+
+    answer = "This request was blocked before agent execution because it is unsafe or outside the supported insurance operations domain."
+    if governance["blocked_reasons"]:
+        answer = answer + " Reason: " + "; ".join(governance["blocked_reasons"])
+
+    response_payload = {
+        "query": governance["redacted_query"],
+        "rewritten_query": "",
+        "answer": answer,
+        "status": "blocked",
+        "llm_model": "none",
+        "embedding_model": "none",
+        "total_sources_used": 0,
+        "sources": [],
+        "tool_calls": [],
+        "governance": governance,
+        "trace_id": trace_id,
+        "trace_file": "",
+        "loop_count": 0,
+        "reflection": {
+            "approved": False,
+            "risk_level": "high",
+            "human_review_required": False,
+            "reason": "Request blocked by input governance before retrieval, tool calling, or LLM generation."
+        },
+        "steps": steps
+    }
+
+    trace_payload = {
+        "trace_id": trace_id,
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        "response": response_payload
+    }
+    trace_file = save_trace(trace_id, trace_payload)
+    response_payload["trace_file"] = trace_file
+    return response_payload
+
 def rewrite_query(original_query, steps):
     prompt_lines = [
-        "You are a query rewriting agent for an insurance Retrieval Augmented Generation system.",
+        "You are a query rewriting agent for an insurance Agentic RAG system.",
         "Rewrite the user question into a precise search query for insurance policy retrieval.",
         "Keep the rewritten query short and focused.",
         "Return only the rewritten query.",
@@ -68,95 +121,76 @@ def decide_if_more_context_needed(results):
         return True, "Top similarity score is low, so another retrieval attempt is useful."
     return False, "Retrieved context appears sufficient for a first answer."
 
-def run_insurance_tools(query, results, steps):
+def run_insurance_tools(query, results, steps, allowed_tool_names):
     tool_calls = []
 
-    coverage_input = {"query": query}
-    coverage_result = execute_tool("coverage_check_tool", coverage_input)
-    tool_calls.append({
-        "tool_name": coverage_result["tool_name"],
-        "ok": coverage_result["ok"],
-        "input": coverage_input,
-        "result": coverage_result["result"],
-        "error": coverage_result["error"]
-    })
-    add_step(
-        steps,
-        "ToolCallingAgent",
-        "execute_coverage_check_tool",
-        coverage_input,
-        coverage_result["result"],
-        {"tool_name": "coverage_check_tool", "ok": coverage_result["ok"]}
-    )
+    if "coverage_check_tool" in allowed_tool_names:
+        coverage_input = {"query": query}
+        coverage_result = execute_tool("coverage_check_tool", coverage_input)
+        tool_calls.append({
+            "tool_name": coverage_result["tool_name"],
+            "ok": coverage_result["ok"],
+            "input": coverage_input,
+            "result": coverage_result["result"],
+            "error": coverage_result["error"]
+        })
+        add_step(steps, "ToolCallingAgent", "execute_coverage_check_tool", coverage_input, coverage_result["result"], {"tool_name": "coverage_check_tool", "ok": coverage_result["ok"]})
 
-    evidence_input = {"query": query}
-    evidence_result = execute_tool("evidence_check_tool", evidence_input)
-    tool_calls.append({
-        "tool_name": evidence_result["tool_name"],
-        "ok": evidence_result["ok"],
-        "input": evidence_input,
-        "result": evidence_result["result"],
-        "error": evidence_result["error"]
-    })
-    add_step(
-        steps,
-        "ToolCallingAgent",
-        "execute_evidence_check_tool",
-        evidence_input,
-        evidence_result["result"],
-        {"tool_name": "evidence_check_tool", "ok": evidence_result["ok"]}
-    )
+    if "evidence_check_tool" in allowed_tool_names:
+        evidence_input = {"query": query}
+        evidence_result = execute_tool("evidence_check_tool", evidence_input)
+        tool_calls.append({
+            "tool_name": evidence_result["tool_name"],
+            "ok": evidence_result["ok"],
+            "input": evidence_input,
+            "result": evidence_result["result"],
+            "error": evidence_result["error"]
+        })
+        add_step(steps, "ToolCallingAgent", "execute_evidence_check_tool", evidence_input, evidence_result["result"], {"tool_name": "evidence_check_tool", "ok": evidence_result["ok"]})
 
-    fraud_input = {"query": query}
-    fraud_result = execute_tool("fraud_signal_tool", fraud_input)
-    tool_calls.append({
-        "tool_name": fraud_result["tool_name"],
-        "ok": fraud_result["ok"],
-        "input": fraud_input,
-        "result": fraud_result["result"],
-        "error": fraud_result["error"]
-    })
-    add_step(
-        steps,
-        "ToolCallingAgent",
-        "execute_fraud_signal_tool",
-        fraud_input,
-        fraud_result["result"],
-        {"tool_name": "fraud_signal_tool", "ok": fraud_result["ok"]}
-    )
+    if "fraud_signal_tool" in allowed_tool_names:
+        fraud_input = {"query": query}
+        fraud_result = execute_tool("fraud_signal_tool", fraud_input)
+        tool_calls.append({
+            "tool_name": fraud_result["tool_name"],
+            "ok": fraud_result["ok"],
+            "input": fraud_input,
+            "result": fraud_result["result"],
+            "error": fraud_result["error"]
+        })
+        add_step(steps, "ToolCallingAgent", "execute_fraud_signal_tool", fraud_input, fraud_result["result"], {"tool_name": "fraud_signal_tool", "ok": fraud_result["ok"]})
 
-    coverage_status = coverage_result["result"].get("coverage_status", "unknown_from_tool_rules")
-    fraud_risk_level = fraud_result["result"].get("fraud_risk_level", "low")
-    missing_evidence_count = 0
+    if "human_review_tool" in allowed_tool_names:
+        coverage_status = "unknown_from_tool_rules"
+        fraud_risk_level = "low"
+        for tool_call in tool_calls:
+            if tool_call["tool_name"] == "coverage_check_tool":
+                coverage_status = tool_call["result"].get("coverage_status", "unknown_from_tool_rules")
+            if tool_call["tool_name"] == "fraud_signal_tool":
+                fraud_risk_level = tool_call["result"].get("fraud_risk_level", "low")
 
-    if not results:
-        missing_evidence_count += 1
+        missing_evidence_count = 0
+        if not results:
+            missing_evidence_count += 1
 
-    human_review_input = {
-        "coverage_status": coverage_status,
-        "fraud_risk_level": fraud_risk_level,
-        "missing_evidence_count": missing_evidence_count
-    }
-    human_review_result = execute_tool("human_review_tool", human_review_input)
-    tool_calls.append({
-        "tool_name": human_review_result["tool_name"],
-        "ok": human_review_result["ok"],
-        "input": human_review_input,
-        "result": human_review_result["result"],
-        "error": human_review_result["error"]
-    })
-    add_step(
-        steps,
-        "ToolCallingAgent",
-        "execute_human_review_tool",
-        human_review_input,
-        human_review_result["result"],
-        {"tool_name": "human_review_tool", "ok": human_review_result["ok"]}
-    )
+        human_review_input = {
+            "coverage_status": coverage_status,
+            "fraud_risk_level": fraud_risk_level,
+            "missing_evidence_count": missing_evidence_count
+        }
+        human_review_result = execute_tool("human_review_tool", human_review_input)
+        tool_calls.append({
+            "tool_name": human_review_result["tool_name"],
+            "ok": human_review_result["ok"],
+            "input": human_review_input,
+            "result": human_review_result["result"],
+            "error": human_review_result["error"]
+        })
+        add_step(steps, "ToolCallingAgent", "execute_human_review_tool", human_review_input, human_review_result["result"], {"tool_name": "human_review_tool", "ok": human_review_result["ok"]})
 
     return tool_calls
 
-def build_answer_prompt(original_query, rewritten_query, results, tool_calls):
+def build_answer_prompt(original_query, rewritten_query, results, tool_calls, governance):
     context_sections = []
     for index, result in enumerate(results, start=1):
         section_lines = [
@@ -171,19 +205,27 @@ def build_answer_prompt(original_query, rewritten_query, results, tool_calls):
         context_sections.append("\n".join(section_lines))
     context_text = "\n\n---\n\n".join(context_sections)
     tool_text = json.dumps(tool_calls, indent=2)
+    governance_text = json.dumps({
+        "intent": governance["intent"],
+        "decomposed_tasks": governance["decomposed_tasks"],
+        "requires_human_review": governance["requires_human_review"]
+    }, indent=2)
     prompt_lines = [
-        "You are an insurance policy analysis agent.",
-        "Answer using only the retrieved context and the structured tool results below.",
+        "You are an insurance policy analysis agent inside an Agentic RAG system.",
+        "Answer using only the retrieved context, governance decision, and structured tool results below.",
         "Do not invent policy rules, claim decisions, exclusions, or legal conclusions.",
         "If evidence is weak or review is required, clearly say human review is required.",
         "Start with a direct answer, then explain retrieved evidence and tool results.",
         "Mention source chunk IDs and relevant tool names used.",
         "",
-        "ORIGINAL USER QUESTION:",
+        "USER QUESTION:",
         original_query,
         "",
         "REWRITTEN SEARCH QUERY:",
         rewritten_query,
+        "",
+        "GOVERNANCE DECISION:",
+        governance_text,
         "",
         "RETRIEVED CONTEXT:",
         context_text,
@@ -195,17 +237,17 @@ def build_answer_prompt(original_query, rewritten_query, results, tool_calls):
     ]
     return "\n".join(prompt_lines)
 
-def reflect_on_answer(original_query, answer, results, tool_calls, steps):
+def reflect_on_answer(original_query, answer, results, tool_calls, governance, steps):
     source_ids = [result["chunk_id"] for result in results]
     tool_names = [tool_call["tool_name"] for tool_call in tool_calls]
-    human_review_required = False
+    human_review_required = governance.get("requires_human_review", False)
     for tool_call in tool_calls:
         if tool_call["tool_name"] == "human_review_tool":
-            human_review_required = tool_call["result"].get("human_review_required", False)
+            human_review_required = human_review_required or tool_call["result"].get("human_review_required", False)
 
     prompt_lines = [
-        "You are a reflection and critique agent for an insurance agentic RAG system.",
-        "Check whether the answer is grounded in retrieved sources and structured tool outputs.",
+        "You are a reflection and critique agent for an insurance Agentic RAG system.",
+        "Check whether the answer is grounded in retrieved sources, governance decisions, and structured tool outputs.",
         "Return a short critique with approval status, risk level, and reason.",
         "",
         "USER QUESTION:",
@@ -218,7 +260,10 @@ def reflect_on_answer(original_query, answer, results, tool_calls, steps):
         ", ".join(source_ids),
         "",
         "TOOLS USED:",
-        ", ".join(tool_names)
+        ", ".join(tool_names),
+        "",
+        "GOVERNANCE RISK FLAGS:",
+        ", ".join(governance.get("risk_flags", []))
     ]
     critique_prompt = "\n".join(prompt_lines)
     critique_result = generate_with_ollama(critique_prompt)
@@ -243,32 +288,42 @@ def reflect_on_answer(original_query, answer, results, tool_calls, steps):
     add_step(
         steps,
         "ReflectionAgent",
-        "check_answer_with_tool_results",
+        "check_answer_with_governance_and_tools",
         answer,
         critique_text,
         {"source_chunk_ids": source_ids, "tool_names": tool_names, "llm_used": critique_result.get("model", "unknown")}
     )
     return reflection
 
-def save_trace(trace_id, trace_payload):
-    ensure_log_dir()
-    trace_file = LOG_DIR / f"agentic_trace_{trace_id}.json"
-    trace_file.write_text(json.dumps(trace_payload, indent=2), encoding="utf-8")
-    return str(trace_file)
-
 def run_agentic_rag(query, document_id=None, top_k=3, max_loops=2):
     trace_id = str(uuid.uuid4())
     steps = []
+    governance = analyze_prompt(query)
+
+    add_step(
+        steps,
+        "InputGuardrailAgent",
+        "analyze_prompt",
+        governance["redacted_query"],
+        governance["governance_summary"],
+        {"domain": governance["domain"], "intent": governance["intent"], "risk_flags": governance["risk_flags"], "route_to": governance["route_to"]}
+    )
+
+    if not governance["allowed"]:
+        return build_blocked_response(query, governance, trace_id, steps)
+
+    effective_query = governance["redacted_query"]
+
     add_step(
         steps,
         "SupervisorAgent",
-        "receive_task",
-        query,
-        "Started agentic RAG workflow with tool calling.",
-        {"document_id": document_id, "top_k": top_k, "max_loops": max_loops}
+        "receive_governed_task",
+        effective_query,
+        "Started governed Agentic RAG workflow with tool calling.",
+        {"document_id": document_id, "top_k": top_k, "max_loops": max_loops, "allowed_tool_names": governance["allowed_tool_names"]}
     )
 
-    rewritten_query = rewrite_query(query, steps)
+    rewritten_query = rewrite_query(effective_query, steps)
     final_results = []
     search_response = None
     loop_count = 0
@@ -278,7 +333,7 @@ def run_agentic_rag(query, document_id=None, top_k=3, max_loops=2):
         if loop_number == 1:
             retrieval_query = rewritten_query
         else:
-            retrieval_query = query + " insurance policy coverage exclusions evidence requirements"
+            retrieval_query = effective_query + " insurance policy coverage exclusions evidence requirements"
 
         search_response = search_vector_index(retrieval_query, document_id=document_id, top_k=top_k)
         current_results = search_response["results"]
@@ -307,14 +362,14 @@ def run_agentic_rag(query, document_id=None, top_k=3, max_loops=2):
         if not needs_more_context:
             break
 
-    tool_calls = run_insurance_tools(query, final_results, steps)
+    tool_calls = run_insurance_tools(effective_query, final_results, steps, governance["allowed_tool_names"])
 
     if not final_results:
         answer = "The provided documents do not contain enough information to answer this question. Human review is required because no retrieved context was available."
         llm_model = "none"
         embedding_model = search_response["embedding_model"] if search_response else "unknown"
     else:
-        answer_prompt = build_answer_prompt(query, rewritten_query, final_results, tool_calls)
+        answer_prompt = build_answer_prompt(effective_query, rewritten_query, final_results, tool_calls, governance)
         llm_result = generate_with_ollama(answer_prompt)
         if not llm_result["ok"]:
             raise RuntimeError(llm_result.get("error", "LLM answer generation failed."))
@@ -324,13 +379,13 @@ def run_agentic_rag(query, document_id=None, top_k=3, max_loops=2):
         add_step(
             steps,
             "AnswerAgent",
-            "generate_grounded_answer_with_tools",
+            "generate_governed_grounded_answer_with_tools",
             answer_prompt,
             answer,
             {"llm_model": llm_model, "prompt_characters": len(answer_prompt)}
         )
 
-    reflection = reflect_on_answer(query, answer, final_results, tool_calls, steps)
+    reflection = reflect_on_answer(effective_query, answer, final_results, tool_calls, governance, steps)
 
     sources = []
     for result in final_results:
@@ -345,7 +400,7 @@ def run_agentic_rag(query, document_id=None, top_k=3, max_loops=2):
 
     status = "approved" if reflection.get("approved") else "needs_review"
     response_payload = {
-        "query": query,
+        "query": effective_query,
         "rewritten_query": rewritten_query,
         "answer": answer,
         "status": status,
@@ -354,6 +409,7 @@ def run_agentic_rag(query, document_id=None, top_k=3, max_loops=2):
         "total_sources_used": len(sources),
         "sources": sources,
         "tool_calls": tool_calls,
+        "governance": governance,
         "trace_id": trace_id,
         "trace_file": "",
         "loop_count": loop_count,

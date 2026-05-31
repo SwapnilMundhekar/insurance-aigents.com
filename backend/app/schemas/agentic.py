@@ -40,6 +40,7 @@ class AgenticRagResponse(BaseModel):
     total_sources_used: int
     sources: List[AgenticRagSource]
     tool_calls: List[AgenticToolCall]
+    governance: Dict[str, Any]
     trace_id: str
     trace_file: str
     loop_count: int
